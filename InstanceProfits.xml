@@ -1,0 +1,8 @@
+<Ui>
+<Frame name="InstanceProfitsFrame">
+ <Scripts>
+   <OnLoad> self:RegisterEvent("ZONE_CHANGED_NEW_AREA"); </OnLoad>
+   <OnEvent function="InstanceProfits_EventHandler" />
+  </Scripts>
+</Frame>
+</Ui>
