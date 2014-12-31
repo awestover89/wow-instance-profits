@@ -13,6 +13,15 @@ function InstanceProfits_EventHandler(self, event, ...)
 			instanceName = name;
 			startRepair = GetRepairAllCost();
 			lootedMoney, vendorMoney = 0, 0;
+			local n = GetNumSavedInstances();
+			for i=1, n do
+				local savedName, savedId = GetSavedInstanceInfo(i);
+				if (savedName == instanceName) then
+					lootedMoney = timeSpent[savedId]['lootedMoney'];
+					vendorMoney = timeSpent[savedId]['vendorMoney'];
+					startTime = startTime - timeSpent[savedId]['time'];
+				end
+			end
 			print("You have entered the " .. difficultyName .. " version of " .. name);
 		elseif inInstance then
 			inInstance = false;
@@ -22,6 +31,7 @@ function InstanceProfits_EventHandler(self, event, ...)
 				local savedName, savedId = GetSavedInstanceInfo(i);
 				if (savedName == instanceName) then
 					timeSpent[savedId] = {
+						['name'] = instanceName,
 						['time'] = totalTime,
 						['lootedMoney'] = lootedMoney,
 						['vendorMoney'] = vendorMoney
