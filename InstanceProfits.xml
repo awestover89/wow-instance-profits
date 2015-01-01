@@ -4,6 +4,8 @@
    <OnLoad> self:RegisterEvent("ZONE_CHANGED_NEW_AREA"); </OnLoad>
    <OnLoad> self:RegisterEvent("LOOT_OPENED"); </OnLoad>
    <OnLoad> self:RegisterEvent("LOOT_CLOSED"); </OnLoad>
+   <OnLoad> self:RegisterEvent("ADDON_LOADED"); </OnLoad>
+   <OnLoad> self:RegisterEvent("PLAYER_LOGOUT"); </OnLoad>
    <OnEvent function="InstanceProfits_EventHandler" />
   </Scripts>
 </Frame>
