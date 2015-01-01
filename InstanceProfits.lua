@@ -1,8 +1,9 @@
 local inInstance = false;
 local timeSpent = {};
-local instanceName, lootedMoney, vendorMoney, startTime, startRepair;
+local instanceName, lootedMoney, vendorMoney, startTime, startRepair, savedId;
 
 function InstanceProfits_EventHandler(self, event, ...)
+	local arg1, arg2 = ...;
 	local lootableItems = {};
 	local ignorezones = { [1152]=true, [1330]=true, [1153]=true, [1154]=true, [1158]=true, [1331]=true, [1159]=true, [1160]=true };
 	if (event == "ZONE_CHANGED_NEW_AREA") then
@@ -15,28 +16,37 @@ function InstanceProfits_EventHandler(self, event, ...)
 			lootedMoney, vendorMoney = 0, 0;
 			local n = GetNumSavedInstances();
 			for i=1, n do
-				local savedName, savedId = GetSavedInstanceInfo(i);
+				local savedName, saveId = GetSavedInstanceInfo(i);
 				if (savedName == instanceName) then
+					savedId = saveId;
 					lootedMoney = timeSpent[savedId]['lootedMoney'];
 					vendorMoney = timeSpent[savedId]['vendorMoney'];
 					startTime = startTime - timeSpent[savedId]['time'];
+					startRepair = startRepair - timeSpent[savedId]['repair'];
 				end
 			end
 			print("You have entered the " .. difficultyName .. " version of " .. name);
 		elseif inInstance then
 			inInstance = false;
 			local totalTime = difftime(time(), startTime);
+			local endRepair = GetRepairAllCost();
 			local n = GetNumSavedInstances();
-			for i=1, n do
-				local savedName, savedId = GetSavedInstanceInfo(i);
-				if (savedName == instanceName) then
-					timeSpent[savedId] = {
-						['name'] = instanceName,
-						['time'] = totalTime,
-						['lootedMoney'] = lootedMoney,
-						['vendorMoney'] = vendorMoney
-					};
+			if (timeSpent[savedId] == nil) then
+				for i=1, n do
+					local savedName, saveId = GetSavedInstanceInfo(i);
+					if (savedName == instanceName) then
+						savedId = saveId;
+					end
 				end
+			end
+			if savedId ~= nil then
+				timeSpent[savedId] = {
+					['name'] = instanceName,
+					['time'] = totalTime,
+					['lootedMoney'] = lootedMoney,
+					['vendorMoney'] = vendorMoney,
+					['repair'] = endRepair - startRepair
+				};
 			end
 			print("You have exited your instance after spending " .. totalTime .. " seconds inside. You earned " .. lootedMoney .. " copper from mobs and " .. vendorMoney .. " copper from looted items that you can vendor.");
 		end
@@ -72,5 +82,12 @@ function InstanceProfits_EventHandler(self, event, ...)
 			_, _, _, _, _, _, _, _, _, _, vendorPrice = GetItemInfo(name);
 			vendorMoney = vendorMoney + (vendorPrice * quantity);
 		end
+	elseif event == "ADDON_LOADED" and arg1 == "InstanceProfits" then
+		timeSpent = _G["IP_InstanceRunsTable"];
+		if timeSpent == nil then
+			timeSpent = {};
+		end
+	elseif event == "PLAYER_LOGOUT" then
+		_G["IP_InstanceRunsTable"] = timeSpent;
 	end
 end
