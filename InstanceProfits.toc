@@ -3,4 +3,3 @@
 ## SavedVariables: IP_InstanceRunsTable
 ## Notes: An addon to track the time spent and gold earned from running raids and dungeons
 InstanceProfits.lua
-InstanceProfits.xml
